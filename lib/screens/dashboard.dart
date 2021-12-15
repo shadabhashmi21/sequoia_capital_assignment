@@ -4,6 +4,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:sequoia_capital_assignment/config/app_strings.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
+import 'package:sequoia_capital_assignment/screens/AddEditProduct.dart';
 
 import '../models/product_model.dart';
 
@@ -19,7 +20,12 @@ class DashboardPage extends HookWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
             child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AddEditProduct()),
+                  );
+                },
                 child: const Text(
                   AppStrings.addProduct,
                   style: TextStyle(color: Colors.white),
@@ -89,6 +95,7 @@ class _PageData extends HookWidget {
                       ),
                     ),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           child: RatingBar.builder(
@@ -105,19 +112,30 @@ class _PageData extends HookWidget {
                           ),
                           flex: 1,
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.edit,
-                            size: 20,
+                        GestureDetector(
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(
+                              Icons.edit,
+                              size: 20,
+                            ),
                           ),
-                          onPressed: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => AddEditProduct(productModel: item,)),
+                            );
+                          },
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete,
-                            size: 20,
+                        GestureDetector(
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(
+                              Icons.delete,
+                              size: 20,
+                            ),
                           ),
-                          onPressed: () {
+                          onTap: () {
                             showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -130,7 +148,7 @@ class _PageData extends HookWidget {
                                             productList.value.removeAt(index);
                                             updateList();
                                           },
-                                          child: const Text(AppStrings.yes)),
+                                          child: const Text(AppStrings.yes, style: TextStyle(color: Colors.red),)),
                                       TextButton(
                                           onPressed: () {
                                             Navigator.pop(context);
