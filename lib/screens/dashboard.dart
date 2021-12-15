@@ -39,22 +39,32 @@ class DashboardPage extends HookWidget {
 }
 
 class _PageData extends HookWidget {
-
   const _PageData({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     final productList = useState(Provider.of<List<ProductModel>>(context));
+
+    void updateList() {
+      productList.value = List.from(productList.value);
+    }
 
     return productList.value.isEmpty
         ? const Center(child: Text(AppStrings.noDataFound))
-        : ListView.builder(
+        : ListView.separated(
+            physics: const BouncingScrollPhysics(),
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(10),
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(
+                height: 10,
+              );
+            },
             itemCount: productList.value.length,
             itemBuilder: (BuildContext context, int index) {
               final item = productList.value[index];
               return Container(
-                margin: const EdgeInsets.all(10),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: Colors.black.withOpacity(0.1)),
                 child: Column(
@@ -62,15 +72,21 @@ class _PageData extends HookWidget {
                   children: [
                     Text(
                       item.name,
-                      style: const TextStyle(fontSize: 20),
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    Text(
-                      item.launchedAt,
-                      style: const TextStyle(fontSize: 20),
+                    Container(
+                      margin: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        item.launchedAt,
+                        style: const TextStyle(fontSize: 14),
+                      ),
                     ),
-                    Text(
-                      item.launchSite,
-                      style: const TextStyle(fontSize: 20),
+                    Container(
+                      margin: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        item.launchSite,
+                        style: const TextStyle(fontSize: 14),
+                      ),
                     ),
                     Row(
                       children: [
@@ -90,12 +106,17 @@ class _PageData extends HookWidget {
                           flex: 1,
                         ),
                         IconButton(
-                          icon: const Icon(Icons.edit),
+                          icon: const Icon(
+                            Icons.edit,
+                            size: 20,
+                          ),
                           onPressed: () {},
-                          constraints: const BoxConstraints(maxHeight: 40),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete),
+                          icon: const Icon(
+                            Icons.delete,
+                            size: 20,
+                          ),
                           onPressed: () {
                             showDialog(
                                 context: context,
@@ -107,7 +128,7 @@ class _PageData extends HookWidget {
                                           onPressed: () {
                                             Navigator.pop(context);
                                             productList.value.removeAt(index);
-                                            productList.value = List.from(productList.value);
+                                            updateList();
                                           },
                                           child: const Text(AppStrings.yes)),
                                       TextButton(
@@ -119,7 +140,6 @@ class _PageData extends HookWidget {
                                   );
                                 });
                           },
-                          constraints: const BoxConstraints(maxHeight: 40),
                         ),
                       ],
                     )
