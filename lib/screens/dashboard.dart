@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:sequoia_capital_assignment/config/app_strings.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
 
@@ -26,32 +28,31 @@ class DashboardPage extends HookWidget {
                     backgroundColor: MaterialStateProperty.all(
                         Colors.white.withOpacity(0.2)),
                     padding: MaterialStateProperty.all<EdgeInsets>(
-                        const EdgeInsets.all(4)))),
+                        const EdgeInsets.symmetric(horizontal: 10)))),
           ),
         ],
       ),
       backgroundColor: Colors.white,
-      body: PageData(),
+      body: const _PageData(),
     );
   }
 }
 
-class PageData extends HookWidget {
-  List<ProductModel> products = [];
+class _PageData extends HookWidget {
 
-  PageData({Key? key}) : super(key: key);
+  const _PageData({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    for (int i = 0; i < 10; i++) {
-      products.add(ProductModel("name", "launchedAt", "launchSite", 0.2));
-    }
-    return products.isEmpty
+
+    final productList = useState(Provider.of<List<ProductModel>>(context));
+
+    return productList.value.isEmpty
         ? const Center(child: Text(AppStrings.noDataFound))
         : ListView.builder(
-            itemCount: products.length,
+            itemCount: productList.value.length,
             itemBuilder: (BuildContext context, int index) {
-              final item = products[index];
+              final item = productList.value[index];
               return Container(
                 margin: const EdgeInsets.all(10),
                 padding: const EdgeInsets.all(10),
@@ -59,12 +60,35 @@ class PageData extends HookWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.name, style: const TextStyle(fontSize: 20),),
-                    Text(item.launchedAt, style: const TextStyle(fontSize: 20),),
-                    Text(item.launchSite, style: const TextStyle(fontSize: 20),),
+                    Text(
+                      item.name,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    Text(
+                      item.launchedAt,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    Text(
+                      item.launchSite,
+                      style: const TextStyle(fontSize: 20),
+                    ),
                     Row(
                       children: [
-                        Expanded(child: Text(item.popularity.toString(), style: const TextStyle(fontSize: 20),), flex: 1,),
+                        Expanded(
+                          child: RatingBar.builder(
+                            initialRating: item.popularity,
+                            direction: Axis.horizontal,
+                            itemCount: 5,
+                            itemSize: 15,
+                            itemBuilder: (context, _) => const Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                            ),
+                            ignoreGestures: true,
+                            onRatingUpdate: (rating) {},
+                          ),
+                          flex: 1,
+                        ),
                         IconButton(
                           icon: const Icon(Icons.edit),
                           onPressed: () {},
@@ -72,7 +96,29 @@ class PageData extends HookWidget {
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
-                          onPressed: () {},
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text(AppStrings.deleteItem),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            productList.value.removeAt(index);
+                                            productList.value = List.from(productList.value);
+                                          },
+                                          child: const Text(AppStrings.yes)),
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(AppStrings.no))
+                                    ],
+                                  );
+                                });
+                          },
                           constraints: const BoxConstraints(maxHeight: 40),
                         ),
                       ],
