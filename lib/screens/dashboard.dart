@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:sequoia_capital_assignment/config/app_strings.dart';
+import 'package:sequoia_capital_assignment/extensions.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
 import 'package:sequoia_capital_assignment/screens/AddEditProduct.dart';
 
@@ -13,6 +15,17 @@ class DashboardPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final productList = useState(Provider.of<List<ProductModel>>(context));
+
+    Future<void> gotoAddProduct() async {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AddEditProduct()),
+      );
+      productList.value.add(result['productModel']);
+      productList.value = List.from(productList.value);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppStrings.dashboard),
@@ -21,10 +34,7 @@ class DashboardPage extends HookWidget {
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
             child: TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AddEditProduct()),
-                  );
+                  gotoAddProduct();
                 },
                 child: const Text(
                   AppStrings.addProduct,
@@ -39,20 +49,31 @@ class DashboardPage extends HookWidget {
         ],
       ),
       backgroundColor: Colors.white,
-      body: const _PageData(),
+      body: _PageData(productList),
     );
   }
 }
 
 class _PageData extends HookWidget {
-  const _PageData({Key? key}) : super(key: key);
+  final ValueNotifier<List<ProductModel>> productList;
+
+  const _PageData(this.productList, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final productList = useState(Provider.of<List<ProductModel>>(context));
-
     void updateList() {
       productList.value = List.from(productList.value);
+    }
+
+    Future<void> gotoEditProduct(int index, ProductModel productModel) async {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                AddEditProduct(updateIndex: index, productModel: productModel)),
+      );
+      productList.value.update(result['updatingIndex'], result['productModel']);
+      updateList();
     }
 
     return productList.value.isEmpty
@@ -121,10 +142,7 @@ class _PageData extends HookWidget {
                             ),
                           ),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => AddEditProduct(productModel: item,)),
-                            );
+                            gotoEditProduct(index, item);
                           },
                         ),
                         GestureDetector(
@@ -148,7 +166,10 @@ class _PageData extends HookWidget {
                                             productList.value.removeAt(index);
                                             updateList();
                                           },
-                                          child: const Text(AppStrings.yes, style: TextStyle(color: Colors.red),)),
+                                          child: const Text(
+                                            AppStrings.yes,
+                                            style: TextStyle(color: Colors.red),
+                                          )),
                                       TextButton(
                                           onPressed: () {
                                             Navigator.pop(context);
