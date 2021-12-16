@@ -5,9 +5,9 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:sequoia_capital_assignment/config/app_colors.dart';
 import 'package:sequoia_capital_assignment/config/app_strings.dart';
+import 'package:sequoia_capital_assignment/config/routes.dart';
 import 'package:sequoia_capital_assignment/extensions.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
-import 'package:sequoia_capital_assignment/screens/add_edit_product.dart';
 
 import '../enums/product_sortby_type.dart';
 import '../models/product_model.dart';
@@ -34,12 +34,14 @@ class DashboardPage extends HookWidget {
     }
 
     Future<void> gotoAddProduct() async {
-      final result = await Navigator.push(
+      dynamic result = await Navigator.pushNamed(
         context,
-        MaterialPageRoute(builder: (context) => const AddEditProduct()),
+        AppRoutes.addProduct,
       );
-      productList.value.add(result['productModel']);
-      productList.value = List.from(productList.value);
+      if (result != null) {
+        productList.value.add(result['productModel']);
+        productList.value = List.from(productList.value);
+      }
     }
 
     void _modalBottomSheetMenu(Function(ProductSortByType) onSortSelected) {
@@ -194,7 +196,7 @@ class DashboardPage extends HookWidget {
           children: [
             TextButton(
               onPressed: () {
-                if(!productList.value.canSort()) {
+                if (!productList.value.canSort()) {
                   return;
                 }
                 _modalBottomSheetMenu((value) {
@@ -208,7 +210,7 @@ class DashboardPage extends HookWidget {
             ),
             IconButton(
                 onPressed: () {
-                  if(!productList.value.canSort()) {
+                  if (!productList.value.canSort()) {
                     return;
                   }
                   selectedSortOrderIsAsc.value = !selectedSortOrderIsAsc.value;
@@ -361,14 +363,16 @@ class _ListPageData extends HookWidget {
     }
 
     Future<void> gotoEditProduct(int index, ProductModel productModel) async {
-      final result = await Navigator.push(
+      dynamic result = Navigator.pushNamed(
         context,
-        MaterialPageRoute(
-            builder: (context) =>
-                AddEditProduct(updateIndex: index, productModel: productModel)),
+        AppRoutes.addProduct,
+        arguments: {'updatingIndex': index, 'productModel': productModel},
       );
-      productList.value.update(result['updatingIndex'], result['productModel']);
-      updateList();
+      if (result != null) {
+        productList.value
+            .update(result['updatingIndex'], result['productModel']);
+        updateList();
+      }
     }
 
     return productList.value.isEmpty

@@ -10,14 +10,15 @@ import 'package:sequoia_capital_assignment/utils/app_utils.dart';
 import '../utils/date_time_utils.dart';
 
 class AddEditProduct extends HookWidget {
-  final ProductModel? productModel;
-  final int? updateIndex;
-
-  const AddEditProduct({Key? key, this.productModel, this.updateIndex})
-      : super(key: key);
+  const AddEditProduct({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
+
+    final ProductModel? productModel = arguments?['productModel'];
+    final int? updateIndex = arguments?['updatingIndex'];
+
     final productList = Provider.of<List<ProductModel>>(context);
 
     TextEditingController nameController = TextEditingController();
@@ -110,11 +111,10 @@ class AddEditProduct extends HookWidget {
                 TextField(
                     controller: launchSiteController,
                     decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
-                      labelText: AppStrings.launchedSite,
+                        border: const OutlineInputBorder(),
+                        labelText: AppStrings.launchedSite,
                         fillColor: AppColors.forumBackgroundColor,
-                        filled: true
-                    )),
+                        filled: true)),
                 Padding(
                   padding: const EdgeInsets.only(top: 15),
                   child: RatingBar.builder(

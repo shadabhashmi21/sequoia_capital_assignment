@@ -1,11 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sequoia_capital_assignment/config/app_colors.dart';
 import 'package:sequoia_capital_assignment/config/app_strings.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
+import 'package:sequoia_capital_assignment/screens/add_edit_product.dart';
 import 'package:sequoia_capital_assignment/screens/dashboard.dart';
 
+import 'config/routes.dart';
+
 void main() {
+
   /// todo - remove hardcoded products
   List<ProductModel> products = [];
   for (int i = 1; i <= 5; i++) {
@@ -30,7 +36,10 @@ class MyApp extends StatelessWidget {
           color: AppColors.appbarColor
         )
       ),
-      home: const DashboardPage(),
+        routes: <String, WidgetBuilder>{
+          AppRoutes.home: (context) => const DashboardPage(),
+          AppRoutes.addProduct: (context) => const AddEditProduct(),
+        }
     );
   }
 }
