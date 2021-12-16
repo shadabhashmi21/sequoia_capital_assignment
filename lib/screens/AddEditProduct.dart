@@ -6,7 +6,6 @@ import 'package:sequoia_capital_assignment/config/app_strings.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
 import 'package:sequoia_capital_assignment/utils/app_utils.dart';
 
-import '../config/app_colors.dart';
 import '../utils/date_time_utils.dart';
 
 class AddEditProduct extends HookWidget {
@@ -27,20 +26,20 @@ class AddEditProduct extends HookWidget {
     launchSiteController.text = productModel?.launchSite ?? "";
     double rating = productModel?.popularity ?? 0;
 
-    bool validation(){
-      if(nameController.text.isEmpty){
+    bool validation() {
+      if (nameController.text.isEmpty) {
         AppUtils.showToast(AppStrings.errorName);
         return false;
       }
-      if(launchedAtController.text.isEmpty){
+      if (launchedAtController.text.isEmpty) {
         AppUtils.showToast(AppStrings.errorLaunchedAt);
         return false;
       }
-      if(launchSiteController.text.isEmpty){
+      if (launchSiteController.text.isEmpty) {
         AppUtils.showToast(AppStrings.errorLaunchedSite);
         return false;
       }
-      if(rating == 0){
+      if (rating == 0) {
         AppUtils.showToast(AppStrings.errorRating);
         return false;
       }
@@ -48,9 +47,12 @@ class AddEditProduct extends HookWidget {
     }
 
     void saveData() {
-      if(validation()){
-        final newProductModel = ProductModel(nameController.text, launchedAtController.text, launchSiteController.text, rating);
-        Navigator.pop(context, {'updatingIndex': updateIndex, 'productModel': newProductModel});
+      AppUtils.closeKeyboard(context);
+      if (validation()) {
+        final newProductModel = ProductModel(nameController.text,
+            launchedAtController.text, launchSiteController.text, rating);
+        Navigator.pop(context,
+            {'updatingIndex': updateIndex, 'productModel': newProductModel});
       }
     }
 
@@ -78,14 +80,13 @@ class AddEditProduct extends HookWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: TextField(
-                    readOnly: true,
+                      readOnly: true,
                       controller: launchedAtController,
                       onTap: () {
-                        AppUtils.showDatePickerDialog(
-                            context, (dateTime) {
+                        AppUtils.showDatePickerDialog(context, (dateTime) {
                           launchedAtController.text =
-                              DateTimeUtils.convertDateTimeToString(dateTime,
-                                  DateTimeUtils.dateFormatYYYYMMDD);
+                              DateTimeUtils.convertDateTimeToString(
+                                  dateTime, DateTimeUtils.dateFormatYYYYMMDD);
                         });
                       },
                       decoration: const InputDecoration(
