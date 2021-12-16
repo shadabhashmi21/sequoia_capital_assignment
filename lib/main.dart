@@ -10,17 +10,30 @@ import 'package:sequoia_capital_assignment/screens/dashboard.dart';
 
 import 'config/routes.dart';
 
-void main() {
+Future<void> init() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
+  /// restrict direct routes access using routes
+  if (kIsWeb) {
+    final String? defaultRouteName =
+        WidgetsBinding.instance?.window.defaultRouteName;
+    if (!(defaultRouteName == AppRoutes.home)) {
+      SystemNavigator.routeUpdated(routeName: AppRoutes.home, previousRouteName: null);
+    }
+  }
+}
+
+void main() {
   /// todo - remove hardcoded products
   List<ProductModel> products = [];
   for (int i = 1; i <= 5; i++) {
-    products.add(
-        ProductModel(i.toString(), (10-i).toString(), "launchSite"+i.toString(), i.toDouble()));
+    products.add(ProductModel(i.toString(), (10 - i).toString(),
+        "launchSite" + i.toString(), i.toDouble()));
   }
-
-  runApp(Provider<List<ProductModel>>.value(
-      value: products, child: const MyApp()));
+  init().then((_) {
+    runApp(Provider<List<ProductModel>>.value(
+        value: products, child: const MyApp()));
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -29,17 +42,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: AppStrings.appTitle,
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          color: AppColors.appbarColor
-        )
-      ),
+        debugShowCheckedModeBanner: false,
+        title: AppStrings.appTitle,
+        theme:
+            ThemeData(appBarTheme: AppBarTheme(color: AppColors.appbarColor)),
         routes: <String, WidgetBuilder>{
           AppRoutes.home: (context) => const DashboardPage(),
           AppRoutes.addProduct: (context) => const AddEditProduct(),
-        }
-    );
+        });
   }
 }
