@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -124,6 +123,7 @@ class _PageData extends HookWidget {
                             direction: Axis.horizontal,
                             itemCount: 5,
                             itemSize: 15,
+                            allowHalfRating: true,
                             itemBuilder: (context, _) => const Icon(
                               Icons.star,
                               color: Colors.amber,

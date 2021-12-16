@@ -12,4 +12,8 @@ class AppStrings{
   static const name = 'Name';
   static const launchedAt = 'Launched At';
   static const launchedSite = 'Launched Site';
+  static const errorName = 'Name cannot be empty';
+  static const errorLaunchedAt = 'Launched At cannot be empty';
+  static const errorLaunchedSite = 'Launched Site cannot be empty';
+  static const errorRating = 'Rating cannot be empty';
 }
