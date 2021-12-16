@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sequoia_capital_assignment/config/app_colors.dart';
 import 'package:sequoia_capital_assignment/config/app_strings.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
 import 'package:sequoia_capital_assignment/screens/dashboard.dart';
@@ -21,10 +22,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: AppStrings.appTitle,
-      home: DashboardPage(),
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          color: AppColors.appbarColor
+        )
+      ),
+      home: const DashboardPage(),
     );
   }
 }

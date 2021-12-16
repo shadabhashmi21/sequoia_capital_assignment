@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:sequoia_capital_assignment/config/app_colors.dart';
 import 'package:sequoia_capital_assignment/config/app_strings.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
 import 'package:sequoia_capital_assignment/utils/app_utils.dart';
@@ -45,7 +46,8 @@ class AddEditProduct extends HookWidget {
         AppUtils.showToast(AppStrings.errorRating);
         return false;
       }
-      if (productModel == null && productList.isNotEmpty &&
+      if (productModel == null &&
+          productList.isNotEmpty &&
           productList
               .where((element) => element.name == nameController.text)
               .isNotEmpty) {
@@ -82,10 +84,11 @@ class AddEditProduct extends HookWidget {
               children: [
                 TextField(
                     controller: nameController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: AppStrings.name,
-                    )),
+                    decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        labelText: AppStrings.name,
+                        fillColor: AppColors.forumBackgroundColor,
+                        filled: true)),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: TextField(
@@ -98,16 +101,19 @@ class AddEditProduct extends HookWidget {
                                   dateTime, DateTimeUtils.dateFormatYYYYMMDD);
                         });
                       },
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: AppStrings.launchedAt,
-                      )),
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: AppStrings.launchedAt,
+                          fillColor: AppColors.forumBackgroundColor,
+                          filled: true)),
                 ),
                 TextField(
                     controller: launchSiteController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
                       labelText: AppStrings.launchedSite,
+                        fillColor: AppColors.forumBackgroundColor,
+                        filled: true
                     )),
                 Padding(
                   padding: const EdgeInsets.only(top: 15),

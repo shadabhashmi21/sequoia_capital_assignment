@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:sequoia_capital_assignment/config/app_colors.dart';
 import 'package:sequoia_capital_assignment/config/app_strings.dart';
 import 'package:sequoia_capital_assignment/extensions.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
 import 'package:sequoia_capital_assignment/screens/add_edit_product.dart';
 
+import '../enums/product_sortby_order.dart';
+import '../enums/product_sortby_type.dart';
 import '../models/product_model.dart';
 
 class DashboardPage extends HookWidget {
@@ -16,6 +19,8 @@ class DashboardPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final productList = useState(Provider.of<List<ProductModel>>(context));
+    final selectedSortType = useState(ProductSortByType.name);
+    final selectedSortOrder = useState(ProductSortByOrder.ascending);
     final isGridViewSelected = useState(false);
 
     Future<void> gotoAddProduct() async {
@@ -26,6 +31,49 @@ class DashboardPage extends HookWidget {
       productList.value.add(result['productModel']);
       productList.value = List.from(productList.value);
     }
+
+    void _modalBottomSheetMenu(Function(ProductSortByType) onSortSelected) {
+      showModalBottomSheet(
+          context: context,
+          builder: (builder) {
+            return Container(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  GestureDetector(
+                    child: Container(
+                      child: Text('Name'),
+                    ),
+                    onTap: () {
+                      onSortSelected.call(ProductSortByType.name);
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            );
+          });
+    }
+
+    /// sort logic ///
+    final isAsc = selectedSortOrder.value == ProductSortByOrder.ascending;
+    switch (selectedSortType.value) {
+      case ProductSortByType.name:
+        productList.value.sortedBy((e) => e.name, isAsc);
+        break;
+      case ProductSortByType.date:
+        productList.value.sortedBy((e) => e.launchedAt, isAsc);
+        break;
+      case ProductSortByType.site:
+        productList.value.sortedBy((e) => e.launchedAt, isAsc);
+        break;
+      case ProductSortByType.ratings:
+        productList.value.sortedBy((e) => e.popularity, isAsc);
+        break;
+    }
+    productList.value = List.from(productList.value);
+
+    ///     ***    ///
 
     return Scaffold(
       appBar: AppBar(
@@ -71,6 +119,22 @@ class DashboardPage extends HookWidget {
       body: isGridViewSelected.value
           ? _GridPageData(productList)
           : _ListPageData(productList),
+      persistentFooterButtons: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            GestureDetector(
+              onTap: () {
+                _modalBottomSheetMenu((value) {
+                  selectedSortType.value = value;
+                });
+              },
+              child: const Text(AppStrings.name),
+            ),
+            IconButton(onPressed: () {}, icon: const Icon(Icons.sort))
+          ],
+        ),
+      ],
     );
   }
 }
@@ -234,7 +298,9 @@ class _ListPageData extends HookWidget {
               final item = productList.value[index];
               return Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Colors.black.withOpacity(0.1)),
+                decoration: BoxDecoration(
+                    color: AppColors.dashboardCardColor,
+                    borderRadius: BorderRadius.circular(8)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -281,6 +347,7 @@ class _ListPageData extends HookWidget {
                             child: Icon(
                               Icons.edit,
                               size: 20,
+                              color: Colors.indigo,
                             ),
                           ),
                           onTap: () {
@@ -293,6 +360,7 @@ class _ListPageData extends HookWidget {
                             child: Icon(
                               Icons.delete,
                               size: 20,
+                              color: Colors.red,
                             ),
                           ),
                           onTap: () {

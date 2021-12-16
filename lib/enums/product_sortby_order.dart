@@ -1,0 +1,3 @@
+enum ProductSortByOrder {
+  ascending, descending
+}
