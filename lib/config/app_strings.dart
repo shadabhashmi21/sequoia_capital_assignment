@@ -17,4 +17,6 @@ class AppStrings{
   static const errorLaunchedSite = 'Launched Site cannot be empty';
   static const errorRating = 'Rating cannot be empty';
   static const errorDuplicateProduct = 'Product is already present';
+  static const listView = 'List View';
+  static const gridView = 'Grid View';
 }

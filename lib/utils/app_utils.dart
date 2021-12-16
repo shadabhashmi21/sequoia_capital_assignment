@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hexcolor/hexcolor.dart';
 
-class AppUtils{
+class AppUtils {
   static showToast(String message) {
     Fluttertoast.showToast(
         msg: message,
@@ -33,7 +32,7 @@ class AppUtils{
             doneStyle: TextStyle(color: Colors.white, fontSize: 16),
             cancelStyle: TextStyle(color: Colors.white, fontSize: 16)),
         onConfirm: (date) {
-          dateCallback(date);
-        }, currentTime: DateTime.now(), locale: LocaleType.en);
+      dateCallback(date);
+    }, currentTime: DateTime.now(), locale: LocaleType.en);
   }
 }
