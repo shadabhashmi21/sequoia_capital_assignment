@@ -8,9 +8,9 @@ import 'package:sequoia_capital_assignment/screens/dashboard.dart';
 void main() {
   /// todo - remove hardcoded products
   List<ProductModel> products = [];
-  for (int i = 0; i < 10; i++) {
+  for (int i = 1; i <= 5; i++) {
     products.add(
-        ProductModel("name - " + i.toString(), "launchedAt", "launchSite", 3));
+        ProductModel(i.toString(), (10-i).toString(), "launchSite"+i.toString(), i.toDouble()));
   }
 
   runApp(Provider<List<ProductModel>>.value(

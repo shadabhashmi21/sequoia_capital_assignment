@@ -9,7 +9,6 @@ import 'package:sequoia_capital_assignment/extensions.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
 import 'package:sequoia_capital_assignment/screens/add_edit_product.dart';
 
-import '../enums/product_sortby_order.dart';
 import '../enums/product_sortby_type.dart';
 import '../models/product_model.dart';
 
@@ -20,8 +19,19 @@ class DashboardPage extends HookWidget {
   Widget build(BuildContext context) {
     final productList = useState(Provider.of<List<ProductModel>>(context));
     final selectedSortType = useState(ProductSortByType.name);
-    final selectedSortOrder = useState(ProductSortByOrder.ascending);
+    final selectedSortOrderIsAsc = useState(true);
     final isGridViewSelected = useState(false);
+
+    var sortTypeText = "";
+    if (selectedSortType.value == ProductSortByType.name) {
+      sortTypeText = AppStrings.name;
+    } else if (selectedSortType.value == ProductSortByType.site) {
+      sortTypeText = AppStrings.launchedSite;
+    } else if (selectedSortType.value == ProductSortByType.date) {
+      sortTypeText = AppStrings.launchedAt;
+    } else {
+      sortTypeText = AppStrings.rating;
+    }
 
     Future<void> gotoAddProduct() async {
       final result = await Navigator.push(
@@ -39,16 +49,67 @@ class DashboardPage extends HookWidget {
             return Container(
               padding: const EdgeInsets.all(10),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    margin: const EdgeInsets.all(5),
+                    child: const Text(
+                      AppStrings.sortBy,
+                      style: TextStyle(fontSize: 25),
+                    ),
+                  ),
                   GestureDetector(
                     child: Container(
-                      child: Text('Name'),
+                      margin: const EdgeInsets.all(5),
+                      child: const Text(
+                        AppStrings.name,
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
                     onTap: () {
                       onSortSelected.call(ProductSortByType.name);
                       Navigator.pop(context);
                     },
-                  )
+                  ),
+                  GestureDetector(
+                    child: Container(
+                      margin: const EdgeInsets.all(5),
+                      child: const Text(
+                        AppStrings.launchedAt,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onTap: () {
+                      onSortSelected.call(ProductSortByType.date);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  GestureDetector(
+                    child: Container(
+                      margin: const EdgeInsets.all(5),
+                      child: const Text(
+                        AppStrings.launchedSite,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onTap: () {
+                      onSortSelected.call(ProductSortByType.site);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  GestureDetector(
+                    child: Container(
+                      margin: const EdgeInsets.all(5),
+                      child: const Text(
+                        AppStrings.rating,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    onTap: () {
+                      onSortSelected.call(ProductSortByType.ratings);
+                      Navigator.pop(context);
+                    },
+                  ),
                 ],
               ),
             );
@@ -56,22 +117,30 @@ class DashboardPage extends HookWidget {
     }
 
     /// sort logic ///
-    final isAsc = selectedSortOrder.value == ProductSortByOrder.ascending;
-    switch (selectedSortType.value) {
-      case ProductSortByType.name:
-        productList.value.sortedBy((e) => e.name, isAsc);
-        break;
-      case ProductSortByType.date:
-        productList.value.sortedBy((e) => e.launchedAt, isAsc);
-        break;
-      case ProductSortByType.site:
-        productList.value.sortedBy((e) => e.launchedAt, isAsc);
-        break;
-      case ProductSortByType.ratings:
-        productList.value.sortedBy((e) => e.popularity, isAsc);
-        break;
+    if (productList.value.isNotEmpty) {
+      switch (selectedSortType.value) {
+        case ProductSortByType.name:
+          productList.value = productList.value
+              .sortedBy((e) => e.name, selectedSortOrderIsAsc.value)
+              .toList();
+          break;
+        case ProductSortByType.date:
+          productList.value = productList.value
+              .sortedBy((e) => e.launchedAt, selectedSortOrderIsAsc.value)
+              .toList();
+          break;
+        case ProductSortByType.site:
+          productList.value = productList.value
+              .sortedBy((e) => e.launchedAt, selectedSortOrderIsAsc.value)
+              .toList();
+          break;
+        case ProductSortByType.ratings:
+          productList.value = productList.value
+              .sortedBy((e) => e.popularity, selectedSortOrderIsAsc.value)
+              .toList();
+          break;
+      }
     }
-    productList.value = List.from(productList.value);
 
     ///     ***    ///
 
@@ -123,15 +192,32 @@ class DashboardPage extends HookWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(
-              onTap: () {
+            TextButton(
+              onPressed: () {
+                if(!productList.value.canSort()) {
+                  return;
+                }
                 _modalBottomSheetMenu((value) {
                   selectedSortType.value = value;
                 });
               },
-              child: const Text(AppStrings.name),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                child: Text(sortTypeText),
+              ),
             ),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.sort))
+            IconButton(
+                onPressed: () {
+                  if(!productList.value.canSort()) {
+                    return;
+                  }
+                  selectedSortOrderIsAsc.value = !selectedSortOrderIsAsc.value;
+                },
+                icon: ImageIcon(
+                  AssetImage(selectedSortOrderIsAsc.value
+                      ? 'assets/ascending_icon.png'
+                      : 'assets/descending_icon.png'),
+                ))
           ],
         ),
       ],
@@ -166,7 +252,11 @@ class _GridPageData extends HookWidget {
               children: [
                 Text(
                   item.name,
-                  style: const TextStyle(fontSize: 18),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 10,
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 6),

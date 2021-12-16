@@ -20,4 +20,5 @@ class AppStrings{
   static const errorDuplicateProduct = 'Product is already present';
   static const listView = 'List View';
   static const gridView = 'Grid View';
+  static const sortBy = 'Sort By';
 }
