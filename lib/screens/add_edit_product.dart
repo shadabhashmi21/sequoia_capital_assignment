@@ -46,7 +46,7 @@ class AddEditProduct extends HookWidget {
         AppUtils.showToast(AppStrings.errorRating);
         return false;
       }
-      if (productList.isNotEmpty &&
+      if (productModel == null && productList.isNotEmpty &&
           productList
               .where((element) => element.name == nameController.text)
               .isNotEmpty) {
