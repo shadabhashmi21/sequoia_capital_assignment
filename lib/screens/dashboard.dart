@@ -269,105 +269,108 @@ class _GridPageData extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisExtent: 175,
-      ),
-      shrinkWrap: true,
-      itemCount: productList.value.length,
-      itemBuilder: (BuildContext context, int index) {
-        var item = productList.value[index];
-        return Card(
-          color: AppColors.dashboardCardColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          elevation: 10,
-          margin: const EdgeInsets.all(10),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.name,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: 6),
-                  child: Text(
-                    item.launchedAt,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: 6),
-                  child: Text(
-                    item.launchSite,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: RatingBar.builder(
-                        initialRating: item.popularity,
-                        direction: Axis.horizontal,
-                        itemCount: 5,
-                        itemSize: 15,
-                        allowHalfRating: true,
-                        itemBuilder: (context, _) => const Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                        ),
-                        ignoreGestures: true,
-                        onRatingUpdate: (rating) {},
-                      ),
-                      flex: 1,
-                    ),
-                    EditIcon(onTap: () => editProduct.call(item, index)),
-                    DeleteIcon(
-                      onTap: () => {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text(AppStrings.deleteItem),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        removeProduct.call(index);
-                                      },
-                                      child: const Text(
-                                        AppStrings.yes,
-                                        style: TextStyle(color: Colors.red),
-                                      )),
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text(AppStrings.no))
-                                ],
-                              );
-                            })
-                      },
-                    )
-                  ],
-                )
-              ],
+    return productList.value.isEmpty
+        ? const Center(child: Text(AppStrings.noDataFound))
+        : GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisExtent: 175,
             ),
-          ),
-        );
-      },
-    );
+            shrinkWrap: true,
+            itemCount: productList.value.length,
+            itemBuilder: (BuildContext context, int index) {
+              var item = productList.value[index];
+              return Card(
+                color: AppColors.dashboardCardColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                elevation: 10,
+                margin: const EdgeInsets.all(10),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.name,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          item.launchedAt,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          item.launchSite,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: RatingBar.builder(
+                              initialRating: item.popularity,
+                              direction: Axis.horizontal,
+                              itemCount: 5,
+                              itemSize: 15,
+                              allowHalfRating: true,
+                              itemBuilder: (context, _) => const Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                              ),
+                              ignoreGestures: true,
+                              onRatingUpdate: (rating) {},
+                            ),
+                            flex: 1,
+                          ),
+                          EditIcon(onTap: () => editProduct.call(item, index)),
+                          DeleteIcon(
+                            onTap: () => {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text(AppStrings.deleteItem),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              removeProduct.call(index);
+                                            },
+                                            child: const Text(
+                                              AppStrings.yes,
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            )),
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text(AppStrings.no))
+                                      ],
+                                    );
+                                  })
+                            },
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
   }
 }
 

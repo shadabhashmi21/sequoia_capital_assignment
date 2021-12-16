@@ -18,21 +18,15 @@ Future<void> init() async {
     final String? defaultRouteName =
         WidgetsBinding.instance?.window.defaultRouteName;
     if (!(defaultRouteName == AppRoutes.home)) {
-      SystemNavigator.routeUpdated(routeName: AppRoutes.home, previousRouteName: null);
+      SystemNavigator.routeUpdated(
+          routeName: AppRoutes.home, previousRouteName: null);
     }
   }
 }
 
 void main() {
-  /// todo - remove hardcoded products
-  List<ProductModel> products = [];
-  for (int i = 1; i <= 5; i++) {
-    products.add(ProductModel(i.toString(), (10 - i).toString(),
-        "launchSite" + i.toString(), i.toDouble()));
-  }
   init().then((_) {
-    runApp(Provider<List<ProductModel>>.value(
-        value: products, child: const MyApp()));
+    runApp(Provider<List<ProductModel>>.value(value: [], child: const MyApp()));
   });
 }
 
