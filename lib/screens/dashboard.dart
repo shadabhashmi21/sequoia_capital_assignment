@@ -11,6 +11,7 @@ import 'package:sequoia_capital_assignment/models/product_model.dart';
 
 import '../enums/product_sortby_type.dart';
 import '../models/product_model.dart';
+import '../utils/app_widgets.dart';
 
 class DashboardPage extends HookWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -33,6 +34,10 @@ class DashboardPage extends HookWidget {
       sortTypeText = AppStrings.rating;
     }
 
+    void updateList() {
+      productList.value = List.from(productList.value);
+    }
+
     Future<void> gotoAddProduct() async {
       dynamic result = await Navigator.pushNamed(
         context,
@@ -40,7 +45,25 @@ class DashboardPage extends HookWidget {
       );
       if (result != null) {
         productList.value.add(result['productModel']);
-        productList.value = List.from(productList.value);
+        updateList();
+      }
+    }
+
+    void removeItemFromList(int index) {
+      productList.value.removeAt(index);
+      updateList();
+    }
+
+    Future<void> gotoEditProduct(int index, ProductModel productModel) async {
+      dynamic result = await Navigator.pushNamed(
+        context,
+        AppRoutes.addProduct,
+        arguments: {'updatingIndex': index, 'productModel': productModel},
+      );
+      if (result != null) {
+        productList.value
+            .update(result['updatingIndex'], result['productModel']);
+        updateList();
       }
     }
 
@@ -188,8 +211,16 @@ class DashboardPage extends HookWidget {
       ),
       backgroundColor: Colors.white,
       body: isGridViewSelected.value
-          ? _GridPageData(productList)
-          : _ListPageData(productList),
+          ? _GridPageData(productList, (index) {
+              removeItemFromList(index);
+            }, (product, index) {
+              gotoEditProduct(index, product);
+            })
+          : _ListPageData(productList, (index) {
+              removeItemFromList(index);
+            }, (product, index) {
+              gotoEditProduct(index, product);
+            }),
       persistentFooterButtons: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -228,22 +259,30 @@ class DashboardPage extends HookWidget {
 }
 
 class _GridPageData extends HookWidget {
+  final Function(int) removeProduct;
+  final Function(ProductModel, int) editProduct;
   final ValueNotifier<List<ProductModel>> productList;
 
-  const _GridPageData(this.productList, {Key? key}) : super(key: key);
+  const _GridPageData(this.productList, this.removeProduct, this.editProduct,
+      {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 16 / 3,
+        mainAxisExtent: 175,
       ),
+      shrinkWrap: true,
       itemCount: productList.value.length,
       itemBuilder: (BuildContext context, int index) {
         var item = productList.value[index];
-        return GridTile(
-            child: Card(
+        return Card(
+          color: AppColors.dashboardCardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
           elevation: 10,
           margin: const EdgeInsets.all(10),
           child: Padding(
@@ -293,27 +332,9 @@ class _GridPageData extends HookWidget {
                       ),
                       flex: 1,
                     ),
-                    GestureDetector(
-                      child: const Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Icon(
-                          Icons.edit,
-                          size: 20,
-                        ),
-                      ),
-                      onTap: () {
-                        //gotoEditProduct(index, item);
-                      },
-                    ),
-                    GestureDetector(
-                      child: const Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Icon(
-                          Icons.delete,
-                          size: 20,
-                        ),
-                      ),
-                      onTap: () {
+                    EditIcon(onTap: () => editProduct.call(item, index)),
+                    DeleteIcon(
+                      onTap: () => {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -323,8 +344,7 @@ class _GridPageData extends HookWidget {
                                   TextButton(
                                       onPressed: () {
                                         Navigator.pop(context);
-                                        productList.value.removeAt(index);
-                                        //updateList();
+                                        removeProduct.call(index);
                                       },
                                       child: const Text(
                                         AppStrings.yes,
@@ -337,15 +357,15 @@ class _GridPageData extends HookWidget {
                                       child: const Text(AppStrings.no))
                                 ],
                               );
-                            });
+                            })
                       },
-                    ),
+                    )
                   ],
                 )
               ],
             ),
           ),
-        ));
+        );
       },
     );
   }
@@ -353,28 +373,15 @@ class _GridPageData extends HookWidget {
 
 class _ListPageData extends HookWidget {
   final ValueNotifier<List<ProductModel>> productList;
+  final Function(int) removeProduct;
+  final Function(ProductModel, int) editProduct;
 
-  const _ListPageData(this.productList, {Key? key}) : super(key: key);
+  const _ListPageData(this.productList, this.removeProduct, this.editProduct,
+      {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    void updateList() {
-      productList.value = List.from(productList.value);
-    }
-
-    Future<void> gotoEditProduct(int index, ProductModel productModel) async {
-      dynamic result = Navigator.pushNamed(
-        context,
-        AppRoutes.addProduct,
-        arguments: {'updatingIndex': index, 'productModel': productModel},
-      );
-      if (result != null) {
-        productList.value
-            .update(result['updatingIndex'], result['productModel']);
-        updateList();
-      }
-    }
-
     return productList.value.isEmpty
         ? const Center(child: Text(AppStrings.noDataFound))
         : ListView.separated(
@@ -435,29 +442,9 @@ class _ListPageData extends HookWidget {
                           ),
                           flex: 1,
                         ),
-                        GestureDetector(
-                          child: const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(
-                              Icons.edit,
-                              size: 20,
-                              color: Colors.indigo,
-                            ),
-                          ),
-                          onTap: () {
-                            gotoEditProduct(index, item);
-                          },
-                        ),
-                        GestureDetector(
-                          child: const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(
-                              Icons.delete,
-                              size: 20,
-                              color: Colors.red,
-                            ),
-                          ),
-                          onTap: () {
+                        EditIcon(onTap: () => editProduct.call(item, index)),
+                        DeleteIcon(
+                          onTap: () => {
                             showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -467,8 +454,7 @@ class _ListPageData extends HookWidget {
                                       TextButton(
                                           onPressed: () {
                                             Navigator.pop(context);
-                                            productList.value.removeAt(index);
-                                            updateList();
+                                            removeProduct.call(index);
                                           },
                                           child: const Text(
                                             AppStrings.yes,
@@ -481,9 +467,9 @@ class _ListPageData extends HookWidget {
                                           child: const Text(AppStrings.no))
                                     ],
                                   );
-                                });
+                                })
                           },
-                        ),
+                        )
                       ],
                     )
                   ],
