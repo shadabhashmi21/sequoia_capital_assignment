@@ -16,4 +16,5 @@ class AppStrings{
   static const errorLaunchedAt = 'Launched At cannot be empty';
   static const errorLaunchedSite = 'Launched Site cannot be empty';
   static const errorRating = 'Rating cannot be empty';
+  static const errorDuplicateProduct = 'Product is already present';
 }

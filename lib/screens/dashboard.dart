@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sequoia_capital_assignment/config/app_strings.dart';
 import 'package:sequoia_capital_assignment/extensions.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
-import 'package:sequoia_capital_assignment/screens/AddEditProduct.dart';
+import 'package:sequoia_capital_assignment/screens/add_edit_product.dart';
 
 import '../models/product_model.dart';
 

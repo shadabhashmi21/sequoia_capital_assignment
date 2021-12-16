@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:sequoia_capital_assignment/config/app_strings.dart';
 import 'package:sequoia_capital_assignment/models/product_model.dart';
 import 'package:sequoia_capital_assignment/utils/app_utils.dart';
@@ -17,6 +18,8 @@ class AddEditProduct extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final productList = Provider.of<List<ProductModel>>(context);
+
     TextEditingController nameController = TextEditingController();
     TextEditingController launchedAtController = TextEditingController();
     TextEditingController launchSiteController = TextEditingController();
@@ -41,6 +44,13 @@ class AddEditProduct extends HookWidget {
       }
       if (rating == 0) {
         AppUtils.showToast(AppStrings.errorRating);
+        return false;
+      }
+      if (productList.isNotEmpty &&
+          productList
+              .where((element) => element.name == nameController.text)
+              .isNotEmpty) {
+        AppUtils.showToast(AppStrings.errorDuplicateProduct);
         return false;
       }
       return true;
